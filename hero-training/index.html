@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<!-- build: v1 -->
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Hero Training</title>
+<meta name="description" content="เช็คลิสต์โปรแกรม Hero Training — ฝึกทีละท่า วนรอบ ไล่น้ำหนักอัตโนมัติ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hero Training">
+<meta name="theme-color" content="#1b1420">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23e11d48%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22>%F0%9F%A6%B8</text></svg>">
+<style>
+:root{
+  --bg:#0f1420; --card:#171f2e; --card2:#1e293b; --border:#2a3448;
+  --text:#e8edf5; --sub:#94a3b8; --accent:#e11d48; --accent2:#22c55e;
+  --danger:#ef4444; --warn:#f59e0b; --blue:#3b82f6;
+  --vol-c:#3b82f6; --str-c:#f59e0b; --peak-c:#ef4444; --done-c:#22c55e;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Sarabun',sans-serif;height:100%;overscroll-behavior-y:contain;}
+body{padding-bottom:calc(64px + var(--safe-bottom));}
+button{font-family:inherit;}
+input,textarea{font-family:inherit;}
+.app{max-width:560px;margin:0 auto;min-height:100vh;position:relative;}
+
+.topbar{position:sticky;top:0;z-index:20;background:rgba(15,20,32,.92);backdrop-filter:blur(10px);padding:calc(12px + var(--safe-top)) 14px 12px;border-bottom:1px solid var(--border);}
+.topbar h1{font-size:17px;margin:0;font-weight:700;display:flex;align-items:center;gap:8px;}
+
+.page{display:none;padding:14px 14px 20px;}
+.page.active{display:block;}
+h2.pt{font-size:18px;margin:4px 0 14px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.card h3{margin:0 0 4px;font-size:14.5px;}
+.card .sub{font-size:11.5px;color:var(--sub);margin-bottom:8px;}
+.sectiontitle{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:18px 0 8px;font-weight:700;}
+
+.liftpicker{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;}
+.liftchip{flex:0 0 auto;padding:9px 14px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);white-space:nowrap;}
+.liftchip .rec{display:block;font-size:9.5px;color:var(--accent2);font-weight:600;}
+.liftchip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.liftchip.active .rec{color:#ffe4e9;}
+
+.herocard{background:linear-gradient(135deg,#3b0f1f,#0f1420);border:1px solid var(--accent);border-radius:16px;padding:16px;margin-bottom:14px;}
+.herocard .phasebadge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px;}
+.herocard .liftname{font-size:20px;font-weight:800;}
+.herocard .schemebig{font-size:15px;color:#fecdd3;margin-top:2px;}
+.herocard .weightrow{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.herocard input{width:90px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:8px;text-align:center;font-size:18px;font-weight:800;}
+.herocard .unit{color:#fecdd3;font-size:13px;}
+.herocard .meta{font-size:11.5px;color:#fda4af;margin-top:8px;}
+
+.setsrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.setchip{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:48px;border-radius:10px;background:var(--card2);border:1px solid var(--border);font-size:10.5px;color:var(--sub);}
+.setchip b{font-size:12.5px;color:var(--text);}
+.setchip.on{background:rgba(34,197,94,.18);border-color:var(--accent2);color:var(--accent2);}
+.setchip.on b{color:var(--accent2);}
+
+.warmup{margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);}
+.warmup summary{font-size:11.5px;color:var(--sub);cursor:pointer;}
+.wu-row{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+.wu-row.done{color:var(--accent2);}
+
+.resultrow{display:flex;gap:10px;margin-top:14px;}
+.resultbtn{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:14px;font-weight:800;}
+.resultbtn.pass{background:var(--accent2);color:#04240f;}
+.resultbtn.fail{background:var(--card2);color:var(--danger);border:1px solid var(--danger);}
+.resultbtn.pass.suggested{box-shadow:0 0 0 3px rgba(34,197,94,.35);}
+.resultbtn.fail.suggested{box-shadow:0 0 0 3px rgba(239,68,68,.35);}
+
+.sessioncard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:10px;}
+.sfield{margin-bottom:10px;}
+.sfield label{font-size:11.5px;color:var(--sub);display:block;margin-bottom:4px;}
+.sfield input[type=date]{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px;font-size:14px;}
+.sfield textarea{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px;font-size:13px;min-height:56px;resize:vertical;}
+.moodrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.moodchip{background:var(--card2);border:1px solid var(--border);color:var(--sub);border-radius:20px;padding:6px 11px;font-size:12px;}
+.moodchip.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.completecard{background:linear-gradient(135deg,#14532d,#0f1420);border:1px solid var(--done-c);border-radius:16px;padding:18px;text-align:center;}
+.completecard .big{font-size:26px;font-weight:800;margin:8px 0;}
+.completecard input{width:110px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:8px;text-align:center;font-size:18px;font-weight:800;}
+.completecard button{margin-top:14px;width:100%;background:var(--accent2);color:#04240f;border:none;border-radius:10px;padding:13px;font-size:14.5px;font-weight:800;}
+
+.skipbtn{width:100%;background:none;border:1px dashed var(--border);color:var(--sub);border-radius:10px;padding:9px;font-size:12px;margin-top:10px;}
+
+.statusgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.statuscell{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px;}
+.statuscell h4{margin:0 0 4px;font-size:13px;}
+.statuscell .p{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:8px;display:inline-block;margin-bottom:4px;}
+.statuscell .w{font-size:16px;font-weight:800;margin-top:2px;}
+.statuscell .meta{font-size:10.5px;color:var(--sub);margin-top:3px;}
+
+.logrow{border-bottom:1px solid rgba(255,255,255,.06);padding:10px 0;}
+.logrow .lh{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;}
+.logrow .lsub{font-size:11px;color:var(--sub);margin-top:2px;}
+.logrow .lnote{font-size:12px;color:#cbd5e1;margin-top:4px;background:var(--card2);padding:6px 8px;border-radius:8px;}
+.tag-pass{color:var(--done-c);}
+.tag-fail{color:var(--danger);}
+
+.filterrow{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.filterchip{padding:6px 12px;border-radius:20px;background:var(--card2);border:1px solid var(--border);font-size:12px;color:var(--sub);}
+.filterchip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:11px;color:var(--sub);}
+.field input{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:14px;text-align:center;font-weight:700;}
+.smallbtn{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 10px;font-size:11.5px;}
+.smallbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.smallbtn.ghost{color:var(--sub);}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(15,20,32,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);max-width:560px;margin:0 auto;}
+.navbtn{flex:1;background:none;border:none;color:var(--sub);padding:9px 4px 8px;font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.navbtn .ic{font-size:19px;}
+.navbtn.active{color:var(--accent);}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--accent2);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+.toast.show{opacity:1;transform:translate(-50%,-6px);}
+
+.introlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.introbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:400px;}
+.introbox h2{margin-top:0;font-size:18px;}
+.introbox p{font-size:13px;color:var(--sub);line-height:1.6;}
+.introbox button{margin-top:8px;width:100%;background:var(--accent);border:none;color:#fff;border-radius:10px;padding:12px;font-size:14px;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="topbar">
+    <h1>🦸 Hero Training</h1>
+  </div>
+
+  <div class="page active" id="page-today">
+    <div class="content" style="padding:12px 14px 0;">
+      <div class="liftpicker" id="liftPicker"></div>
+      <div id="todayContent"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-status">
+    <h2 class="pt">สถานะทั้ง 4 ท่า</h2>
+    <div class="statusgrid" id="statusGrid"></div>
+    <div class="sectiontitle">แคลอรี่ที่เผาผลาญ (ประมาณการ)</div>
+    <div class="card" id="kcalCard"></div>
+    <div class="sectiontitle">สถิติ 1RM (PR ล่าสุดของแต่ละท่า)</div>
+    <div class="card" id="prCard"></div>
+  </div>
+
+  <div class="page" id="page-history">
+    <h2 class="pt">ประวัติการฝึก</h2>
+    <div class="filterrow" id="historyFilter"></div>
+    <div class="card" id="historyList"></div>
+  </div>
+
+  <div class="page" id="page-setup">
+    <h2 class="pt">ตั้งค่า 1RM เริ่มต้น</h2>
+    <p class="sub" style="margin-top:-8px;">ใช้สำหรับเริ่มรอบใหม่ของแต่ละท่า (น้ำหนักเริ่มต้น = 40% ของ 1RM นี้) การแก้เลขนี้ไม่กระทบรอบที่กำลังฝึกอยู่ เว้นแต่กด "เริ่มรอบใหม่จากค่านี้"</p>
+    <div id="setupCards"></div>
+    <div class="sectiontitle">หลักการโปรแกรม Hero Training</div>
+    <div class="card">
+      <div class="sub">
+        ฝึกทีละท่า วนไป Squat → Bench → Deadlift → OHP วันเว้นวันหรือตามความเหมาะสมในการฟื้นตัว<br><br>
+        <b>ทุกเซสชันน้ำหนักเพิ่มขึ้น 2.5kg เสมอ</b> ไม่ว่าจะผ่านหรือไม่ผ่าน — ผ่าน = ทำสูตรเดิมต่อที่น้ำหนักใหม่ / ไม่ผ่าน = ขยับไปสูตรถัดไป (เซ็ตน้อยลง)<br><br>
+        <b>Volume:</b> 10×10 → 10×5 &nbsp;|&nbsp; <b>Strength:</b> 7×3 → 5×2 &nbsp;|&nbsp; <b>Peak:</b> 3×1 → 1×1<br><br>
+        เมื่อ 1×1 ทำไม่ผ่าน = จบรอบ ได้ 1RM ใหม่ (น้ำหนักที่ยกสำเร็จครั้งล่าสุด) แล้วเริ่มรอบใหม่ที่ 40% ของ 1RM ใหม่ได้ทันที
+      </div>
+    </div>
+    <div class="sectiontitle">วิธีคำนวณแคลอรี่ (โดยประมาณ)</div>
+    <div class="card">
+      <div class="sub">
+        ใช้สูตร MET แยกช่วง "ยก" กับ "พัก" — ช่วงยก (รวมวอร์มอัพ) ใช้ MET 6.0 (ยกหนักแบบพาวเวอร์ลิฟต์) ส่วนช่วงพักระหว่างเซ็ตใช้ MET 1.5 (ยืน/เดินเบาๆ)<br><br>
+        เวลาที่ใช้ยกจริงประมาณจากจำนวนครั้ง×เซ็ตของสูตรวันนั้น ส่วนเวลาพักกรอกเองได้ (ระยะเวลารวมทั้งเซสชัน ในหน้า "วันนี้") หรือถ้าไม่กรอกจะประมาณให้จากค่าพักทั่วไปของแต่ละเฟส (Volume ~1.5 นาที/เซ็ต, Strength ~3 นาที/เซ็ต, Peak ~5 นาที/เซ็ต)<br><br>
+        ตัวเลขนี้เป็น<b>ค่าประมาณ</b>เพื่อใช้ติดตามแนวโน้ม ไม่ใช่ค่าที่วัดได้จริงจากอุปกรณ์ (เช่น นาฬิกา heart rate)
+      </div>
+    </div>
+    <div class="sectiontitle">ข้อมูล / สำรองข้อมูล</div>
+    <div class="card">
+      <div class="row-between">
+        <button class="smallbtn" id="btnExport">📤 ส่งออกข้อมูล (JSON)</button>
+        <button class="smallbtn" id="btnImport">📥 นำเข้าข้อมูล</button>
+      </div>
+      <input type="file" id="fileImport" accept="application/json" style="display:none;">
+      <div class="row-between" style="margin-top:8px;">
+        <button class="smallbtn ghost" id="btnResetAll">⚠️ ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomnav">
+    <button class="navbtn active" data-page="today"><span class="ic">🔥</span>วันนี้</button>
+    <button class="navbtn" data-page="status"><span class="ic">📊</span>สถานะ</button>
+    <button class="navbtn" data-page="history"><span class="ic">📜</span>ประวัติ</button>
+    <button class="navbtn" data-page="setup"><span class="ic">⚙️</span>ตั้งค่า</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<div class="introlay" id="introlay">
+  <div class="introbox">
+    <h2>🦸 Hero Training</h2>
+    <p>โปรแกรมฝึกทีละท่า วนรอบ Squat → Bench → Deadlift → OHP น้ำหนักไล่ขึ้นทีละ 2.5kg ทุกเซสชัน ไล่ระดับ Volume → Strength → Peak จนพบ 1RM ใหม่ แล้ววนรอบใหม่ได้เรื่อยๆ</p>
+    <p><b>เพิ่มเป็นแอปในมือถือ:</b> แนะนำใช้ผ่านแท็บ Safari ปกติ (Add Bookmark) จะเก็บข้อมูลได้เสถียรที่สุด</p>
+    <button id="introClose">เริ่มใช้งาน</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const LIFTS = ['Squat','Bench','Deadlift','OHP'];
+const LIFT_TH = {Squat:'Back Squat', Bench:'Bench Press', Deadlift:'Deadlift', OHP:'Overhead Press'};
+const DEFAULT_1RM = {Squat:150, Bench:90, Deadlift:150, OHP:70};
+
+const LADDER = [
+  {phase:'Volume', label:'10×10', sets:10, reps:10},
+  {phase:'Volume', label:'10×5',  sets:10, reps:5},
+  {phase:'Strength', label:'7×3', sets:7,  reps:3},
+  {phase:'Strength', label:'5×2', sets:5,  reps:2},
+  {phase:'Peak', label:'3×1', sets:3, reps:1},
+  {phase:'Peak', label:'1×1', sets:1, reps:1},
+];
+const PHASE_COLOR = {Volume:'var(--vol-c)', Strength:'var(--str-c)', Peak:'var(--peak-c)'};
+const MOODS = ['สบายๆ 😌','ปกติ 🙂','เหนื่อยมาก 😓','ยกไม่ครบ ⚠️','ข้ามวัน ❌'];
+
+function round25(n){ return Math.round(n/2.5)*2.5; }
+
+/* ============ CALORIE ESTIMATE (วิธีที่ 2: แยก MET ช่วงยก/ช่วงพัก) ============ */
+const MET_ACTIVE = 6.0;   // ยกน้ำหนักหนักแบบพาวเวอร์ลิฟต์ (vigorous effort)
+const MET_REST   = 1.5;   // ยืน/เดินเบาๆ ระหว่างพัก
+const SEC_PER_REP = { Volume:3.5, Strength:5, Peak:7 };       // เวลาต่อครั้งโดยประมาณ (ยิ่งหนัก/ครั้งน้อย ยิ่งช้า)
+const REST_PER_SET_MIN = { Volume:1.5, Strength:3, Peak:5 };  // นาทีพักต่อเซ็ตจริงโดยทั่วไปของพาวเวอร์ลิฟต์
+const WARMUP_ACTIVE_SEC = 66;  // 4 เซ็ตวอร์มอัพ (10+6+4+2 ครั้ง) x ~3 วิ/ครั้ง
+const WARMUP_REST_MIN   = 3;   // พักสั้นๆ ระหว่างเซ็ตวอร์มอัพ 4 เซ็ต
+
+function computeSessionEnergy(scheme, bodyweightKg, manualDurationMin){
+  const bw = Number(bodyweightKg) || 75;
+  const workingActiveSec = scheme.sets * scheme.reps * SEC_PER_REP[scheme.phase];
+  const activeMin = (workingActiveSec + WARMUP_ACTIVE_SEC) / 60;
+
+  let restMin, totalMin, durationSource;
+  const manual = Number(manualDurationMin);
+  if(manualDurationMin!=null && manualDurationMin!=='' && !isNaN(manual) && manual > 0){
+    totalMin = manual;
+    restMin = Math.max(0, totalMin - activeMin);
+    durationSource = 'manual';
+  } else {
+    restMin = scheme.sets * REST_PER_SET_MIN[scheme.phase] + WARMUP_REST_MIN;
+    totalMin = activeMin + restMin;
+    durationSource = 'estimated';
+  }
+
+  const kcal = (MET_ACTIVE * 3.5 * bw / 200 * activeMin) + (MET_REST * 3.5 * bw / 200 * restMin);
+  return { activeMin, restMin, totalMin, kcal: Math.round(kcal), durationSource };
+}
+
+/* ============ STORAGE ============ */
+const STORE_KEY = 'hero_v1';
+function freshLiftState(oneRM){
+  return {
+    oneRM: oneRM,
+    startWeight: round25(oneRM*0.40),
+    sessionCount: 0,
+    schemeIndex: 0,
+    lastConfirmedWeight: null,
+    completed: false,
+    cycleCount: 1,
+    prHistory: [],
+    sessions: [],
+    checks: {},        // today's set-chip checks, keyed by set index (reset when a session is logged)
+    todayOverride: null, // manual weight override for the upcoming session
+    live: null          // in-progress set/rest timer state (see startLiveTimer/handleLiveToggle)
+  };
+}
+/* live = { setIdx, phase:'active'|'rest'|'done', phaseStartTs, pendingReps, setLogs:[{reps,activeSec}], restLogs:[sec] } */
+function handleLiveToggle(lift){
+  const ls = state.hero[lift];
+  const scheme = LADDER[ls.schemeIndex];
+  if(!ls.live){
+    ls.live = { setIdx:0, phase:'active', phaseStartTs: Date.now(), pendingReps: scheme.reps, setLogs:[], restLogs:[] };
+  } else if(ls.live.phase === 'active'){
+    const activeSec = (Date.now() - ls.live.phaseStartTs) / 1000;
+    ls.live.setLogs.push({ reps: Number(ls.live.pendingReps)||0, activeSec });
+    if(ls.live.setIdx + 1 < scheme.sets){
+      ls.live.setIdx += 1;
+      ls.live.phase = 'rest';
+      ls.live.phaseStartTs = Date.now();
+      ls.live.pendingReps = scheme.reps;
+    } else {
+      ls.live.phase = 'done';
+    }
+  } else if(ls.live.phase === 'rest'){
+    const restSec = (Date.now() - ls.live.phaseStartTs) / 1000;
+    ls.live.restLogs.push(restSec);
+    ls.live.phase = 'active';
+    ls.live.phaseStartTs = Date.now();
+  }
+  saveState();
+  render();
+}
+function finalizeLiveIfNeeded(ls){
+  if(!ls.live) return;
+  if(ls.live.phase === 'active'){
+    const activeSec = (Date.now() - ls.live.phaseStartTs) / 1000;
+    ls.live.setLogs.push({ reps: Number(ls.live.pendingReps)||0, activeSec });
+    ls.live.phase = 'done';
+  } else if(ls.live.phase === 'rest'){
+    const restSec = (Date.now() - ls.live.phaseStartTs) / 1000;
+    ls.live.restLogs.push(restSec);
+    ls.live.phase = 'done';
+  }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveState(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+
+let state = loadState();
+if(!state){
+  state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75 };
+  LIFTS.forEach(l=>{ state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
+}
+// safety: ensure all lifts exist (in case of partial import)
+LIFTS.forEach(l=>{ if(!state.hero[l]) state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
+if(!state.ui) state.ui = { curLift:'Squat' };
+if(state.bodyweight==null) state.bodyweight = 75;
+
+/* ============ CALC HELPERS ============ */
+function todayWeightFor(ls){
+  return ls.startWeight + 2.5*ls.sessionCount;
+}
+function recommendedLift(){
+  let best=null, bestDate=null;
+  LIFTS.forEach(l=>{
+    const ls = state.hero[l];
+    const last = ls.sessions.length ? ls.sessions[ls.sessions.length-1].date : null;
+    const key = last || '0000-00-00';
+    if(best===null || key < bestDate){ best=l; bestDate=key; }
+  });
+  return best || 'Squat';
+}
+function logSession(lift, result, meta){
+  const ls = state.hero[lift];
+  const scheme = LADDER[ls.schemeIndex];
+  const weight = ls.todayOverride!=null ? Number(ls.todayOverride) : todayWeightFor(ls);
+
+  finalizeLiveIfNeeded(ls);
+  let energy, setLogs = null;
+  if(ls.live && ls.live.setLogs && ls.live.setLogs.length){
+    const totalActiveSec = ls.live.setLogs.reduce((a,s)=>a+s.activeSec, 0);
+    const totalRestSec = ls.live.restLogs.reduce((a,r)=>a+r, 0);
+    const bw = Number(state.bodyweight) || 75;
+    const activeMin = (totalActiveSec + WARMUP_ACTIVE_SEC) / 60;
+    const restMin = (totalRestSec / 60) + WARMUP_REST_MIN;
+    const kcal = Math.round((MET_ACTIVE * 3.5 * bw / 200 * activeMin) + (MET_REST * 3.5 * bw / 200 * restMin));
+    energy = { activeMin, restMin, totalMin: activeMin + restMin, kcal, durationSource: 'timer' };
+    setLogs = ls.live.setLogs.map(s=>({ reps: s.reps, activeSec: Math.round(s.activeSec) }));
+  } else {
+    energy = computeSessionEnergy(scheme, state.bodyweight, meta.durationMin);
+  }
+
+  const session = {
+    date: meta.date || new Date().toISOString().slice(0,10),
+    schemeIndex: ls.schemeIndex, phase: scheme.phase, label: scheme.label,
+    weight, result, notes: meta.notes||'', mood: meta.mood||'',
+    kcal: energy.kcal, activeMin: energy.activeMin, restMin: energy.restMin,
+    durationMin: energy.totalMin, durationSource: energy.durationSource,
+    setLogs
+  };
+  ls.sessions.push(session);
+  if(result==='pass'){
+    ls.lastConfirmedWeight = weight;
+  }
+  ls.sessionCount += 1;
+  ls.todayOverride = null;
+  ls.checks = {};
+  ls.live = null;
+  if(result==='fail'){
+    if(ls.schemeIndex < LADDER.length-1){
+      ls.schemeIndex += 1;
+    } else {
+      // final scheme (1x1) failed -> cycle complete
+      ls.completed = true;
+      ls.newRM = ls.lastConfirmedWeight!=null ? ls.lastConfirmedWeight : ls.startWeight;
+    }
+  }
+  saveState();
+}
+function startNewCycle(lift, oneRM){
+  const ls = state.hero[lift];
+  const cycleCount = ls.cycleCount + 1;
+  const prHistory = ls.prHistory.slice();
+  if(ls.completed && ls.newRM!=null){
+    prHistory.push({date: new Date().toISOString().slice(0,10), weight: ls.newRM});
+  }
+  const fresh = freshLiftState(oneRM);
+  fresh.cycleCount = cycleCount;
+  fresh.prHistory = prHistory;
+  state.hero[lift] = fresh;
+  saveState();
+}
+
+/* ============ UI STATE ============ */
+let curPage = 'today';
+let liveTickTimer = null;
+function fmtMMSS(sec){
+  const s = Math.max(0, Math.floor(sec));
+  const mm = String(Math.floor(s/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  return `${mm}:${ss}`;
+}
+
+/* ============ RENDER: TODAY PAGE ============ */
+function renderLiftPicker(){
+  const wrap = document.getElementById('liftPicker');
+  wrap.innerHTML='';
+  const rec = recommendedLift();
+  LIFTS.forEach(l=>{
+    const btn = document.createElement('button');
+    btn.className = 'liftchip' + (state.ui.curLift===l?' active':'');
+    btn.innerHTML = `${LIFT_TH[l]}${l===rec?'<span class="rec">แนะนำวันนี้</span>':''}`;
+    btn.onclick = ()=>{ state.ui.curLift = l; saveState(); render(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderToday(){
+  if(liveTickTimer){ clearInterval(liveTickTimer); liveTickTimer = null; }
+  const el = document.getElementById('todayContent');
+  el.innerHTML = '';
+  const lift = state.ui.curLift;
+  const ls = state.hero[lift];
+
+  if(ls.completed){
+    el.appendChild(renderCompleteCard(lift, ls));
+    return;
+  }
+
+  const scheme = LADDER[ls.schemeIndex];
+  const calcWeight = todayWeightFor(ls);
+  const weight = ls.todayOverride!=null ? Number(ls.todayOverride) : calcWeight;
+
+  const hero = document.createElement('div');
+  hero.className = 'herocard';
+  hero.innerHTML = `
+    <span class="phasebadge" style="background:${PHASE_COLOR[scheme.phase]};color:${scheme.phase==='Strength'?'#3a2400':'#fff'};">${scheme.phase} Phase</span>
+    <div class="liftname">${LIFT_TH[lift]}</div>
+    <div class="schemebig">${scheme.label} · เซสชันที่ ${ls.sessionCount+1} ของรอบนี้ (รอบที่ ${ls.cycleCount})</div>
+    <div class="weightrow">
+      <input type="number" step="2.5" value="${weight}" id="todayW">
+      <span class="unit">kg${ls.todayOverride!=null?' · ปรับเอง':''}</span>
+    </div>
+    <div class="meta">1RM เริ่มต้นรอบนี้: ${ls.oneRM}kg · น้ำหนักเริ่ม: ${ls.startWeight}kg${ls.lastConfirmedWeight!=null?` · ล่าสุดที่ยกผ่าน: ${ls.lastConfirmedWeight}kg`:''}</div>
+  `;
+  el.appendChild(hero);
+
+  // live set/rest timer + reps-per-set log
+  const setsCard = document.createElement('div');
+  setsCard.className='card';
+  const doneSets = ls.live ? ls.live.setLogs.length : 0;
+  let chipsHtml = `<div class="setsrow" style="margin-top:0;">`;
+  if(ls.live){
+    ls.live.setLogs.forEach((s,i)=>{
+      const short = s.reps < scheme.reps;
+      chipsHtml += `<div class="setchip on"${short?' style="border-color:var(--warn);color:var(--warn);"':''}><div>#${i+1}</div><b>${s.reps}/${scheme.reps}</b></div>`;
+    });
+  }
+  for(let i=doneSets;i<scheme.sets;i++){
+    chipsHtml += `<div class="setchip"><div>#${i+1}</div><b>${scheme.reps} ครั้ง</b></div>`;
+  }
+  chipsHtml += `</div>`;
+
+  let controlsHtml;
+  if(!ls.live){
+    controlsHtml = `<button class="resultbtn pass" id="btnLiveToggle" style="width:100%;">▶️ เริ่มจับเวลา เซ็ตที่ 1</button>`;
+  } else if(ls.live.phase === 'active'){
+    controlsHtml = `
+      <div class="sub" style="margin-bottom:6px;">กำลังยกเซ็ตที่ ${ls.live.setIdx+1} · ⏱ <span id="liveTick">${fmtMMSS((Date.now()-ls.live.phaseStartTs)/1000)}</span></div>
+      <div class="sfield" style="margin-bottom:8px;">
+        <label>จำนวนครั้งที่ทำได้ (เป้าหมาย ${scheme.reps} ครั้ง — แก้ได้ถ้าทำไม่ครบ)</label>
+        <input type="number" id="pendingReps" value="${ls.live.pendingReps}" min="0">
+      </div>
+      <button class="resultbtn pass" id="btnLiveToggle" style="width:100%;">⏸ จบเซ็ตที่ ${ls.live.setIdx+1} (เริ่มพัก)</button>
+    `;
+  } else if(ls.live.phase === 'rest'){
+    controlsHtml = `
+      <div class="sub" style="margin-bottom:6px;">กำลังพัก · ⏱ <span id="liveTick">${fmtMMSS((Date.now()-ls.live.phaseStartTs)/1000)}</span></div>
+      <button class="resultbtn fail" id="btnLiveToggle" style="width:100%;">▶️ เริ่มเซ็ตที่ ${ls.live.setIdx+1}</button>
+    `;
+  } else {
+    controlsHtml = `<div class="sub" style="color:var(--accent2);margin:0;">✅ ครบทุกเซ็ตแล้ว — กดผ่าน/ไม่ผ่านด้านล่างเพื่อบันทึก</div>`;
+  }
+
+  setsCard.innerHTML = `<h3>เซ็ตวันนี้ (${doneSets}/${scheme.sets})</h3>${chipsHtml}<div style="margin-top:12px;">${controlsHtml}</div>`;
+
+  if(ls.live){
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'skipbtn';
+    resetBtn.style.marginTop = '10px';
+    resetBtn.textContent = '↺ รีเซ็ตตัวจับเวลาเซสชันนี้';
+    resetBtn.onclick = ()=>{
+      if(confirm('รีเซ็ตตัวจับเวลาของเซสชันนี้? ข้อมูลเซ็ต/เวลาที่จับไว้ในเซสชันนี้จะหายไป')){
+        ls.live = null; saveState(); render();
+      }
+    };
+    setsCard.appendChild(resetBtn);
+  }
+
+  // warm-up (เช็คลิสต์ติ๊กว่าทำแล้ว ไม่จับเวลา)
+  const wu = document.createElement('details');
+  wu.className='warmup';
+  wu.open = true;
+  const wuPct=[0.2,0.4,0.6,0.8], wuReps=[10,6,4,2];
+  const wuDoneCount = wuPct.filter((_,i)=>!!ls.checks[i]).length;
+  let wuRows='';
+  wuPct.forEach((p,i)=>{
+    const done = !!ls.checks[i];
+    wuRows += `<div class="wu-row${done?' done':''}" data-wu="${i}"><span>${done?'☑':'☐'} ${Math.round(p*100)}% × ${wuReps[i]}</span><span>${round25(p*weight)} kg</span></div>`;
+  });
+  wu.innerHTML = `<summary>วอร์มอัพ (${wuDoneCount}/4)</summary>${wuRows}`;
+  setsCard.appendChild(wu);
+  el.appendChild(setsCard);
+
+  // pass/fail buttons
+  const suggestPass = !!(ls.live && ls.live.setLogs && ls.live.setLogs.length >= scheme.sets && ls.live.setLogs.every(s=>s.reps >= scheme.reps));
+  const resultCard = document.createElement('div');
+  resultCard.className='card';
+  resultCard.innerHTML = `
+    <div class="sub" style="margin-bottom:0;">ทำครบ ${scheme.sets} เซ็ตแล้วหรือยัง? บันทึกผลเซสชันนี้</div>
+    <div class="resultrow">
+      <button class="resultbtn pass${suggestPass?' suggested':''}" id="btnPass">✅ ผ่าน (ยกครบ)</button>
+      <button class="resultbtn fail${!suggestPass?' suggested':''}" id="btnFail">❌ ไม่ผ่าน</button>
+    </div>
+  `;
+  el.appendChild(resultCard);
+
+  // session meta (date/mood/notes) — captured at logging time
+  const sess = document.createElement('div');
+  sess.className='sessioncard';
+  sess.innerHTML = `
+    <h3 style="margin:0 0 10px;font-size:14px;">📝 บันทึกเซสชัน</h3>
+    <div class="sfield">
+      <label>วันที่ฝึก</label>
+      <input type="date" id="sessDate" value="${new Date().toISOString().slice(0,10)}">
+    </div>
+    <div class="sfield">
+      <label>ระยะเวลารวมทั้งเซสชัน (นาที) — ใช้เฉพาะถ้าไม่ได้กดจับเวลาด้านบน ถ้าไม่กรอกจะประมาณให้อัตโนมัติ</label>
+      <input type="number" id="sessDuration" min="1" placeholder="เช่น 45">
+    </div>
+    <div class="sfield">
+      <label>ความรู้สึก (เลือกได้)</label>
+      <div class="moodrow" id="moodRow">
+        ${MOODS.map(m=>`<button type="button" class="moodchip" data-mood="${m}">${m}</button>`).join('')}
+      </div>
+    </div>
+    <div class="sfield">
+      <label>หมายเหตุ</label>
+      <textarea id="sessNotes" placeholder="เช่น เหนื่อยมาก, ฟอร์มเริ่มเสีย, รู้สึกดี..."></textarea>
+    </div>
+  `;
+  el.appendChild(sess);
+
+  el.appendChild(Object.assign(document.createElement('button'), {
+    className:'skipbtn', textContent:'⏭️ ข้ามท่านี้ไปก่อน (ยังไม่ฝึกวันนี้)',
+    onclick: ()=>{ const idx=LIFTS.indexOf(lift); state.ui.curLift = LIFTS[(idx+1)%4]; render(); }
+  }));
+
+  let selectedMood = '';
+  setTimeout(()=>{
+    document.getElementById('todayW').addEventListener('change', e=>{
+      ls.todayOverride = e.target.value; saveState(); render();
+    });
+
+    const toggleBtn = document.getElementById('btnLiveToggle');
+    if(toggleBtn){
+      toggleBtn.addEventListener('click', ()=> handleLiveToggle(lift));
+    }
+    setsCard.querySelectorAll('[data-wu]').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        const i = Number(row.getAttribute('data-wu'));
+        if(ls.checks[i]) delete ls.checks[i]; else ls.checks[i] = true;
+        saveState(); render();
+      });
+    });
+    const pendingInput = document.getElementById('pendingReps');
+    if(pendingInput){
+      pendingInput.addEventListener('input', e=>{
+        if(ls.live) ls.live.pendingReps = e.target.value;
+      });
+    }
+    if(ls.live && (ls.live.phase==='active' || ls.live.phase==='rest')){
+      const tickEl = document.getElementById('liveTick');
+      if(tickEl){
+        liveTickTimer = setInterval(()=>{
+          const el2 = document.getElementById('liveTick');
+          if(!el2 || !ls.live){ clearInterval(liveTickTimer); liveTickTimer=null; return; }
+          el2.textContent = fmtMMSS((Date.now()-ls.live.phaseStartTs)/1000);
+        }, 1000);
+      }
+    }
+
+    sess.querySelectorAll('[data-mood]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        selectedMood = (selectedMood===btn.getAttribute('data-mood'))?'':btn.getAttribute('data-mood');
+        sess.querySelectorAll('.moodchip').forEach(b=>b.classList.toggle('sel', b.getAttribute('data-mood')===selectedMood));
+      });
+    });
+    function doLog(result){
+      const meta = {
+        date: document.getElementById('sessDate').value,
+        notes: document.getElementById('sessNotes').value,
+        mood: selectedMood,
+        durationMin: document.getElementById('sessDuration').value
+      };
+      logSession(lift, result, meta);
+      const lastSess = ls.sessions[ls.sessions.length-1];
+      saveState(); render();
+      const kcalMsg = lastSess ? ` · ≈${lastSess.kcal} kcal` : '';
+      showToast((result==='pass' ? '🎉 บันทึกผ่านแล้ว น้ำหนักครั้งหน้า +2.5kg' : '📈 บันทึกแล้ว เลื่อนสูตรถัดไป +2.5kg') + kcalMsg);
+    }
+    document.getElementById('btnPass').addEventListener('click', ()=>doLog('pass'));
+    document.getElementById('btnFail').addEventListener('click', ()=>doLog('fail'));
+  },0);
+}
+
+function renderCompleteCard(lift, ls){
+  const card = document.createElement('div');
+  card.className='completecard';
+  card.innerHTML = `
+    <div style="font-size:34px;">🏆</div>
+    <div style="font-size:14px;color:#bbf7d0;">จบรอบที่ ${ls.cycleCount} แล้ว!</div>
+    <div class="big">1RM ใหม่: ${ls.newRM} kg</div>
+    <div style="font-size:12px;color:#bbf7d0;">${LIFT_TH[lift]} — เดิม ${ls.oneRM}kg</div>
+    <div style="margin-top:12px;font-size:12px;color:#d1fae5;">ยืนยัน/ปรับ 1RM ก่อนเริ่มรอบใหม่ (เริ่มที่ 40% ของค่านี้)</div>
+    <input type="number" step="0.5" id="newRMInput" value="${ls.newRM}">
+    <button id="startNewCycleBtn">🚀 เริ่มรอบใหม่</button>
+  `;
+  setTimeout(()=>{
+    document.getElementById('startNewCycleBtn').addEventListener('click', ()=>{
+      const v = Number(document.getElementById('newRMInput').value) || ls.newRM;
+      startNewCycle(lift, v);
+      render();
+      showToast('เริ่มรอบใหม่แล้ว 💪');
+    });
+  },0);
+  return card;
+}
+
+/* ============ STATUS PAGE ============ */
+function renderStatus(){
+  const grid = document.getElementById('statusGrid');
+  grid.innerHTML='';
+  LIFTS.forEach(l=>{
+    const ls = state.hero[l];
+    const cell = document.createElement('div');
+    cell.className='statuscell';
+    if(ls.completed){
+      cell.innerHTML = `<h4>${LIFT_TH[l]}</h4><div class="p" style="background:var(--done-c);color:#04240f;">จบรอบแล้ว</div><div class="w">🏆 ${ls.newRM}kg</div><div class="meta">รอตั้งรอบใหม่ในหน้า "วันนี้"</div>`;
+    } else {
+      const scheme = LADDER[ls.schemeIndex];
+      const w = todayWeightFor(ls);
+      const last = ls.sessions.length? ls.sessions[ls.sessions.length-1].date : 'ยังไม่เคยฝึก';
+      cell.innerHTML = `<h4>${LIFT_TH[l]}</h4><div class="p" style="background:${PHASE_COLOR[scheme.phase]};color:${scheme.phase==='Strength'?'#3a2400':'#fff'};">${scheme.phase} · ${scheme.label}</div><div class="w">${w}kg</div><div class="meta">รอบที่ ${ls.cycleCount} · เซสชัน ${ls.sessionCount+1} · ล่าสุด ${last}</div>`;
+    }
+    grid.appendChild(cell);
+  });
+
+  const prCard = document.getElementById('prCard');
+  let rows='';
+  LIFTS.forEach(l=>{
+    const ls = state.hero[l];
+    const hist = ls.prHistory.slice().reverse();
+    rows += `<div style="margin-bottom:10px;"><b style="font-size:12.5px;">${LIFT_TH[l]}</b> <span class="sub" style="margin:0;">(เริ่ม ${DEFAULT_1RM[l]}kg)</span><br>`;
+    if(!hist.length){
+      rows += `<span class="sub" style="margin:0;">ยังไม่มี PR ใหม่ (กำลังอยู่รอบแรก)</span>`;
+    } else {
+      rows += hist.map(h=>`<span style="display:inline-block;background:var(--card2);border-radius:8px;padding:3px 8px;font-size:11.5px;margin:2px 4px 0 0;">${h.date}: <b style="color:var(--accent2);">${h.weight}kg</b></span>`).join('');
+    }
+    rows += `</div>`;
+  });
+  prCard.innerHTML = rows;
+
+  renderKcalSummary();
+}
+
+function renderKcalSummary(){
+  const el = document.getElementById('kcalCard');
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+  const weekAgo = new Date(now.getTime() - 6*86400000).toISOString().slice(0,10); // 7 วันล่าสุดรวมวันนี้
+
+  let total=0, today=0, week=0, count=0;
+  LIFTS.forEach(l=>{
+    state.hero[l].sessions.forEach(s=>{
+      if(typeof s.kcal !== 'number') return;
+      total += s.kcal; count++;
+      if(s.date === todayStr) today += s.kcal;
+      if(s.date >= weekAgo) week += s.kcal;
+    });
+  });
+
+  if(!count){
+    el.innerHTML = `<div class="sub" style="margin:0;">ยังไม่มีข้อมูลเซสชันที่คำนวณแคลอรี่ได้</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="grid4">
+      <div class="field"><label>วันนี้</label><div style="font-size:18px;font-weight:800;">${today} kcal</div></div>
+      <div class="field"><label>7 วันล่าสุด</label><div style="font-size:18px;font-weight:800;">${week} kcal</div></div>
+    </div>
+    <div class="sub" style="margin-top:10px;">รวมสะสมทั้งหมด: <b style="color:var(--text);">${total} kcal</b> จาก ${count} เซสชัน</div>
+    <div class="sub" style="margin-top:6px;font-size:10.5px;">*ประมาณการจากสูตร MET แยกช่วงยก/ช่วงพัก (ยกหนัก MET 6.0 · พัก MET 1.5) และน้ำหนักตัวที่ตั้งไว้ในหน้าตั้งค่า เป็นค่าประมาณ ไม่ใช่ค่าที่วัดจริง</div>
+  `;
+}
+
+/* ============ HISTORY PAGE ============ */
+let historyFilterLift = 'all';
+function renderHistoryFilter(){
+  const wrap = document.getElementById('historyFilter');
+  wrap.innerHTML='';
+  const opts = [{k:'all', label:'ทั้งหมด'}, ...LIFTS.map(l=>({k:l,label:LIFT_TH[l]}))];
+  opts.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='filterchip'+(historyFilterLift===o.k?' active':'');
+    btn.textContent=o.label;
+    btn.onclick=()=>{ historyFilterLift=o.k; render(); };
+    wrap.appendChild(btn);
+  });
+}
+function repsSummary(session){
+  if(!session.setLogs || !session.setLogs.length) return '';
+  const scheme = LADDER[session.schemeIndex];
+  if(!scheme) return '';
+  const totalTarget = scheme.sets * scheme.reps;
+  const totalDone = session.setLogs.reduce((a,s)=>a+s.reps, 0);
+  const shortSets = session.setLogs.map((s,i)=>({i,r:s.reps})).filter(x=>x.r < scheme.reps).map(x=>`#${x.i+1}(${x.r}/${scheme.reps})`);
+  let out = `รวม ${totalDone}/${totalTarget} ครั้ง`;
+  if(shortSets.length) out += ` · ทำไม่ครบ: ${shortSets.join(', ')}`;
+  return out;
+}
+function renderHistoryList(){
+  const wrap = document.getElementById('historyList');
+  let entries = [];
+  LIFTS.forEach(l=>{
+    if(historyFilterLift!=='all' && historyFilterLift!==l) return;
+    state.hero[l].sessions.forEach((s,idx)=> entries.push({l, s, idx}));
+  });
+  entries.sort((a,b)=> (b.s.date.localeCompare(a.s.date)) || 0);
+  if(!entries.length){
+    wrap.innerHTML = '<div class="sub" style="margin:0;">ยังไม่มีประวัติการฝึก</div>';
+    return;
+  }
+  wrap.innerHTML = entries.map(e=>`
+    <div class="logrow">
+      <div class="lh">
+        <span>${LIFT_TH[e.l]} · ${e.s.label} (${e.s.phase})</span>
+        <span class="${e.s.result==='pass'?'tag-pass':'tag-fail'}">${e.s.result==='pass'?'✅ ผ่าน':'❌ ไม่ผ่าน'}</span>
+      </div>
+      <div class="lsub">${e.s.date} · ${e.s.weight}kg${typeof e.s.kcal==='number'?(' · ≈'+e.s.kcal+' kcal'):''}${e.s.mood?(' · '+e.s.mood):''}</div>
+      ${repsSummary(e.s)?`<div class="lsub">${repsSummary(e.s)}</div>`:''}
+      ${e.s.notes?`<div class="lnote">${escapeHtml(e.s.notes)}</div>`:''}
+    </div>
+  `).join('');
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============ SETUP PAGE ============ */
+function renderSetup(){
+  const wrap = document.getElementById('setupCards');
+  wrap.innerHTML='';
+
+  const bwCard = document.createElement('div');
+  bwCard.className = 'card';
+  bwCard.innerHTML = `
+    <h3>น้ำหนักตัว (สำหรับคำนวณแคลอรี่)</h3>
+    <div class="sub" style="margin-bottom:8px;">ใช้คำนวณแคลอรี่โดยประมาณของแต่ละเซสชัน (ดูได้ในหน้า "ประวัติ" และ "สถานะ")</div>
+    <div class="field"><label>น้ำหนักตัว (kg)</label><input type="number" step="0.5" value="${state.bodyweight}" id="bodyweightInput"></div>
+  `;
+  wrap.appendChild(bwCard);
+
+  LIFTS.forEach(l=>{
+    const ls = state.hero[l];
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `
+      <div class="row-between">
+        <h3>${LIFT_TH[l]}</h3>
+        <span class="sub" style="margin:0;">รอบที่ ${ls.cycleCount}${ls.completed?' · จบรอบแล้ว':''}</span>
+      </div>
+      <div class="grid4">
+        <div class="field"><label>1RM เริ่มต้น (kg)</label><input type="number" step="0.5" value="${ls.oneRM}" data-oneRM="${l}"></div>
+        <div class="field"><label>น้ำหนักเริ่ม (40%)</label><input type="number" value="${round25(document.querySelector ? ls.oneRM*0.4 : ls.oneRM*0.4)}" disabled style="opacity:.6;"></div>
+      </div>
+      <button class="smallbtn ghost" data-forcenew="${l}" style="margin-top:10px;width:100%;">🔄 เริ่มรอบใหม่จากค่านี้ทันที (ล้างความคืบหน้ารอบปัจจุบัน)</button>
+    `;
+    wrap.appendChild(card);
+  });
+  setTimeout(()=>{
+    document.getElementById('bodyweightInput').addEventListener('change', e=>{
+      state.bodyweight = Number(e.target.value) || 75;
+      saveState();
+    });
+    wrap.querySelectorAll('[data-oneRM]').forEach(inp=>{
+      inp.addEventListener('change', e=>{
+        const l = e.target.getAttribute('data-oneRM');
+        state.hero[l].oneRM = Number(e.target.value);
+        saveState(); render();
+      });
+    });
+    wrap.querySelectorAll('[data-forcenew]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const l = e.target.getAttribute('data-forcenew');
+        if(confirm(`เริ่มรอบใหม่ของ ${LIFT_TH[l]} ทันทีหรือไม่? ความคืบหน้ารอบปัจจุบันจะถูกล้าง (ประวัติเก่ายังอยู่)`)){
+          startNewCycle(l, state.hero[l].oneRM);
+          render(); showToast('เริ่มรอบใหม่แล้ว');
+        }
+      });
+    });
+  },0);
+}
+
+/* ============ TOAST ============ */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+/* ============ NAV / RENDER ROOT ============ */
+function goPage(p){
+  if(p!=='today' && liveTickTimer){ clearInterval(liveTickTimer); liveTickTimer=null; }
+  curPage = p;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-page')===p));
+  render();
+  window.scrollTo(0,0);
+}
+function render(){
+  if(curPage==='today'){ renderLiftPicker(); renderToday(); }
+  else if(curPage==='status'){ renderStatus(); }
+  else if(curPage==='history'){ renderHistoryFilter(); renderHistoryList(); }
+  else if(curPage==='setup'){ renderSetup(); }
+}
+
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click', ()=>goPage(b.getAttribute('data-page'))));
+
+document.getElementById('btnExport').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'hero_training_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
+document.getElementById('btnImport').onclick = ()=> document.getElementById('fileImport').click();
+document.getElementById('fileImport').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data.hero) throw new Error('invalid');
+      state = data;
+      LIFTS.forEach(l=>{ if(!state.hero[l]) state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
+      if(!state.ui) state.ui = { curLift:'Squat' };
+      if(state.bodyweight==null) state.bodyweight = 75;
+      saveState(); render(); showToast('นำเข้าข้อมูลสำเร็จ');
+    }catch(err){ showToast('ไฟล์ไม่ถูกต้อง'); }
+  };
+  reader.readAsText(file);
+});
+document.getElementById('btnResetAll').onclick = ()=>{
+  if(confirm('ล้างข้อมูลทั้งหมด (ทุกท่า ทุกรอบ ทุกประวัติ) ใช่หรือไม่?')){
+    state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75 };
+    LIFTS.forEach(l=>{ state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
+    saveState(); render(); showToast('ล้างข้อมูลแล้ว');
+  }
+};
+
+document.getElementById('introClose').onclick = ()=>{
+  document.getElementById('introlay').style.display='none';
+  try{ localStorage.setItem('hero_seen_intro','1'); }catch(e){}
+};
+try{ if(localStorage.getItem('hero_seen_intro')) document.getElementById('introlay').style.display='none'; }catch(e){}
+
+state.ui.curLift = recommendedLift();
+render();
+</script>
+</body>
+</html>
