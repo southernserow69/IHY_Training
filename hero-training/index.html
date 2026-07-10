@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Hero Training</title>
+<title>Hero Training (Big 4)</title>
 <meta name="description" content="เช็คลิสต์โปรแกรม Hero Training — ฝึกทีละท่า วนรอบ ไล่น้ำหนักอัตโนมัติ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -95,12 +95,21 @@ h2.pt{font-size:18px;margin:4px 0 14px;}
 .statuscell .w{font-size:16px;font-weight:800;margin-top:2px;}
 .statuscell .meta{font-size:10.5px;color:var(--sub);margin-top:3px;}
 
-.logrow{border-bottom:1px solid rgba(255,255,255,.06);padding:10px 0;}
+.logrow{border-bottom:1px solid rgba(255,255,255,.06);padding:10px 0;cursor:pointer;}
 .logrow .lh{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;}
+.logrow .lh .arrow{color:var(--sub);font-weight:400;margin-left:6px;}
 .logrow .lsub{font-size:11px;color:var(--sub);margin-top:2px;}
 .logrow .lnote{font-size:12px;color:#cbd5e1;margin-top:4px;background:var(--card2);padding:6px 8px;border-radius:8px;}
 .tag-pass{color:var(--done-c);}
 .tag-fail{color:var(--danger);}
+
+.detaillay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:110;display:flex;align-items:center;justify-content:center;padding:16px;}
+.detailbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:440px;width:100%;max-height:82vh;overflow-y:auto;}
+.detailbox h2{margin:0;font-size:16px;}
+.detailtable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}
+.detailtable th,.detailtable td{padding:6px 4px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);}
+.detailtable th{color:var(--sub);font-weight:600;font-size:10px;text-transform:uppercase;}
+.detailtable td.short{color:var(--warn);font-weight:700;}
 
 .filterrow{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .filterchip{padding:6px 12px;border-radius:20px;background:var(--card2);border:1px solid var(--border);font-size:12px;color:var(--sub);}
@@ -134,7 +143,7 @@ h2.pt{font-size:18px;margin:4px 0 14px;}
 <div class="app" id="app">
 
   <div class="topbar">
-    <h1>🦸 Hero Training</h1>
+    <h1>🦸 Hero Training <span style="font-size:11px;font-weight:600;color:var(--sub);">(Big 4)</span></h1>
   </div>
 
   <div class="page active" id="page-today">
@@ -154,8 +163,12 @@ h2.pt{font-size:18px;margin:4px 0 14px;}
   </div>
 
   <div class="page" id="page-history">
-    <h2 class="pt">ประวัติการฝึก</h2>
+    <h2 class="pt">วิเคราะห์ผล</h2>
+    <div class="filterrow" id="metricFilter"></div>
     <div class="filterrow" id="historyFilter"></div>
+    <div class="filterrow" id="rangeFilter"></div>
+    <div class="card" id="chartCard"></div>
+    <div class="sectiontitle">ประวัติการฝึก (แตะแถวเพื่อดูรายละเอียด)</div>
     <div class="card" id="historyList"></div>
   </div>
 
@@ -196,7 +209,7 @@ h2.pt{font-size:18px;margin:4px 0 14px;}
   <div class="bottomnav">
     <button class="navbtn active" data-page="today"><span class="ic">🔥</span>วันนี้</button>
     <button class="navbtn" data-page="status"><span class="ic">📊</span>สถานะ</button>
-    <button class="navbtn" data-page="history"><span class="ic">📜</span>ประวัติ</button>
+    <button class="navbtn" data-page="history"><span class="ic">📈</span>วิเคราะห์</button>
     <button class="navbtn" data-page="setup"><span class="ic">⚙️</span>ตั้งค่า</button>
   </div>
 
@@ -205,11 +218,19 @@ h2.pt{font-size:18px;margin:4px 0 14px;}
 
 <div class="introlay" id="introlay">
   <div class="introbox">
-    <h2>🦸 Hero Training</h2>
+    <h2>🦸 Hero Training <span style="font-size:13px;font-weight:600;color:var(--sub);">(Big 4: Squat · Bench · Deadlift · OHP)</span></h2>
     <p>โปรแกรมฝึกทีละท่า วนรอบ Squat → Bench → Deadlift → OHP น้ำหนักไล่ขึ้นทีละ 2.5kg ทุกเซสชัน ไล่ระดับ Volume → Strength → Peak จนพบ 1RM ใหม่ แล้ววนรอบใหม่ได้เรื่อยๆ</p>
     <p><b>เพิ่มเป็นแอปในมือถือ:</b> แนะนำใช้ผ่านแท็บ Safari ปกติ (Add Bookmark) จะเก็บข้อมูลได้เสถียรที่สุด</p>
     <button id="introClose">เริ่มใช้งาน</button>
   </div>
+</div>
+
+<div class="detaillay" id="detailLay" style="display:none;">
+  <div class="detailbox" id="detailBox"></div>
+</div>
+
+<div class="detaillay" id="weeklyLay" style="display:none;">
+  <div class="detailbox" id="weeklyBox"></div>
 </div>
 
 <script>
@@ -328,13 +349,26 @@ function saveState(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)
 
 let state = loadState();
 if(!state){
-  state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75 };
+  state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75, bodyweightLog: [] };
   LIFTS.forEach(l=>{ state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
 }
 // safety: ensure all lifts exist (in case of partial import)
 LIFTS.forEach(l=>{ if(!state.hero[l]) state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
 if(!state.ui) state.ui = { curLift:'Squat' };
 if(state.bodyweight==null) state.bodyweight = 75;
+if(!Array.isArray(state.bodyweightLog)) state.bodyweightLog = [];
+
+function logBodyweight(date, weight){
+  const w = Number(weight);
+  if(!date || !w || isNaN(w) || w<=0) return false;
+  const idx = state.bodyweightLog.findIndex(e=>e.date===date);
+  if(idx>=0) state.bodyweightLog[idx].weight = w;
+  else state.bodyweightLog.push({date, weight:w});
+  state.bodyweightLog.sort((a,b)=>a.date.localeCompare(b.date));
+  state.bodyweight = w;
+  saveState();
+  return true;
+}
 
 /* ============ CALC HELPERS ============ */
 function todayWeightFor(ls){
@@ -356,7 +390,7 @@ function logSession(lift, result, meta){
   const weight = ls.todayOverride!=null ? Number(ls.todayOverride) : todayWeightFor(ls);
 
   finalizeLiveIfNeeded(ls);
-  let energy, setLogs = null;
+  let energy, setLogs = null, restLogsArr = null;
   if(ls.live && ls.live.setLogs && ls.live.setLogs.length){
     const totalActiveSec = ls.live.setLogs.reduce((a,s)=>a+s.activeSec, 0);
     const totalRestSec = ls.live.restLogs.reduce((a,r)=>a+r, 0);
@@ -366,6 +400,7 @@ function logSession(lift, result, meta){
     const kcal = Math.round((MET_ACTIVE * 3.5 * bw / 200 * activeMin) + (MET_REST * 3.5 * bw / 200 * restMin));
     energy = { activeMin, restMin, totalMin: activeMin + restMin, kcal, durationSource: 'timer' };
     setLogs = ls.live.setLogs.map(s=>({ reps: s.reps, activeSec: Math.round(s.activeSec) }));
+    restLogsArr = ls.live.restLogs.map(r=>Math.round(r));
   } else {
     energy = computeSessionEnergy(scheme, state.bodyweight, meta.durationMin);
   }
@@ -376,7 +411,7 @@ function logSession(lift, result, meta){
     weight, result, notes: meta.notes||'', mood: meta.mood||'',
     kcal: energy.kcal, activeMin: energy.activeMin, restMin: energy.restMin,
     durationMin: energy.totalMin, durationSource: energy.durationSource,
-    setLogs
+    setLogs, restLogs: restLogsArr
   };
   ls.sessions.push(session);
   if(result==='pass'){
@@ -532,24 +567,12 @@ function renderToday(){
   setsCard.appendChild(wu);
   el.appendChild(setsCard);
 
-  // pass/fail buttons
-  const suggestPass = !!(ls.live && ls.live.setLogs && ls.live.setLogs.length >= scheme.sets && ls.live.setLogs.every(s=>s.reps >= scheme.reps));
-  const resultCard = document.createElement('div');
-  resultCard.className='card';
-  resultCard.innerHTML = `
-    <div class="sub" style="margin-bottom:0;">ทำครบ ${scheme.sets} เซ็ตแล้วหรือยัง? บันทึกผลเซสชันนี้</div>
-    <div class="resultrow">
-      <button class="resultbtn pass${suggestPass?' suggested':''}" id="btnPass">✅ ผ่าน (ยกครบ)</button>
-      <button class="resultbtn fail${!suggestPass?' suggested':''}" id="btnFail">❌ ไม่ผ่าน</button>
-    </div>
-  `;
-  el.appendChild(resultCard);
-
-  // session meta (date/mood/notes) — captured at logging time
+  // session meta (date/mood/notes) — captured at logging time, shown BEFORE pass/fail
+  // so it's filled in before accidentally tapping ผ่าน/ไม่ผ่าน
   const sess = document.createElement('div');
   sess.className='sessioncard';
   sess.innerHTML = `
-    <h3 style="margin:0 0 10px;font-size:14px;">📝 บันทึกเซสชัน</h3>
+    <h3 style="margin:0 0 10px;font-size:14px;">📝 บันทึกเซสชัน (กรอกก่อนกดผ่าน/ไม่ผ่านด้านล่าง)</h3>
     <div class="sfield">
       <label>วันที่ฝึก</label>
       <input type="date" id="sessDate" value="${new Date().toISOString().slice(0,10)}">
@@ -570,6 +593,19 @@ function renderToday(){
     </div>
   `;
   el.appendChild(sess);
+
+  // pass/fail buttons
+  const suggestPass = !!(ls.live && ls.live.setLogs && ls.live.setLogs.length >= scheme.sets && ls.live.setLogs.every(s=>s.reps >= scheme.reps));
+  const resultCard = document.createElement('div');
+  resultCard.className='card';
+  resultCard.innerHTML = `
+    <div class="sub" style="margin-bottom:0;">ทำครบ ${scheme.sets} เซ็ตแล้วหรือยัง? บันทึกผลเซสชันนี้</div>
+    <div class="resultrow">
+      <button class="resultbtn pass${suggestPass?' suggested':''}" id="btnPass">✅ ผ่าน (ยกครบ)</button>
+      <button class="resultbtn fail${!suggestPass?' suggested':''}" id="btnFail">❌ ไม่ผ่าน</button>
+    </div>
+  `;
+  el.appendChild(resultCard);
 
   el.appendChild(Object.assign(document.createElement('button'), {
     className:'skipbtn', textContent:'⏭️ ข้ามท่านี้ไปก่อน (ยังไม่ฝึกวันนี้)',
@@ -724,8 +760,69 @@ function renderKcalSummary(){
   `;
 }
 
-/* ============ HISTORY PAGE ============ */
+/* ============ WEEKLY SUMMARY ============ */
+function getWeeklySummary(){
+  const todayStr = new Date().toISOString().slice(0,10);
+  const weekAgo = new Date(Date.now() - 6*86400000).toISOString().slice(0,10);
+  let sessionCount = 0, kcalTotal = 0;
+  const volByLift = {}; LIFTS.forEach(l=>{ volByLift[l]=0; });
+  LIFTS.forEach(l=>{
+    state.hero[l].sessions.forEach(s=>{
+      if(s.date>=weekAgo && s.date<=todayStr){
+        sessionCount++;
+        kcalTotal += (typeof s.kcal==='number' ? s.kcal : 0);
+        volByLift[l] += sessionValue(s, 'volume');
+      }
+    });
+  });
+  let bestLift=null, bestVol=0;
+  LIFTS.forEach(l=>{ if(volByLift[l]>bestVol){ bestVol=volByLift[l]; bestLift=l; } });
+  return { sessionCount, kcalTotal: Math.round(kcalTotal), bestLift, bestVol: Math.round(bestVol) };
+}
+function showWeeklySummary(sum){
+  const box = document.getElementById('weeklyBox');
+  box.innerHTML = `
+    <div class="row-between">
+      <h2>📅 สรุป 7 วันล่าสุด</h2>
+      <button class="smallbtn ghost" id="weeklyCloseBtn">✕ ปิด</button>
+    </div>
+    <div class="grid4" style="margin-top:12px;">
+      <div class="field"><label>เซสชันที่ฝึก</label><div style="font-size:20px;font-weight:800;">${sum.sessionCount}</div></div>
+      <div class="field"><label>แคลอรี่รวม</label><div style="font-size:20px;font-weight:800;">${sum.kcalTotal} kcal</div></div>
+    </div>
+    ${sum.bestLift ? `<div class="sub" style="margin-top:12px;">🏆 ท่าที่ยกปริมาณเยอะสุดสัปดาห์นี้: <b style="color:var(--text);">${LIFT_TH[sum.bestLift]}</b> (${sum.bestVol.toLocaleString()} kg รวม)</div>` : ''}
+    <div class="sub" style="margin-top:10px;">สู้ๆ ต่อไปครับ 💪</div>
+  `;
+  document.getElementById('weeklyLay').style.display = 'flex';
+  setTimeout(()=>{
+    const btn = document.getElementById('weeklyCloseBtn');
+    if(btn) btn.addEventListener('click', ()=>{ document.getElementById('weeklyLay').style.display='none'; });
+  },0);
+}
+
+/* ============ HISTORY / วิเคราะห์ PAGE ============ */
 let historyFilterLift = 'all';
+let analysisMetric = 'weight';
+let analysisRange = 'all';
+const LIFT_COLORS = { Squat:'#e11d48', Bench:'#3b82f6', Deadlift:'#f59e0b', OHP:'#22c55e' };
+const RANGES = [
+  {k:'all', label:'ทั้งหมด', days:null},
+  {k:'7d',  label:'1 สัปดาห์', days:7},
+  {k:'1m',  label:'1 เดือน', days:30},
+  {k:'3m',  label:'3 เดือน', days:90},
+  {k:'6m',  label:'6 เดือน', days:180},
+  {k:'1y',  label:'1 ปี', days:365},
+];
+function rangeCutoffDate(){
+  const r = RANGES.find(x=>x.k===analysisRange);
+  if(!r || r.days==null) return null;
+  return new Date(Date.now() - r.days*86400000).toISOString().slice(0,10);
+}
+function filterSessionsByRange(sessions){
+  const cutoff = rangeCutoffDate();
+  if(!cutoff) return sessions;
+  return sessions.filter(s=>s.date>=cutoff);
+}
 function renderHistoryFilter(){
   const wrap = document.getElementById('historyFilter');
   wrap.innerHTML='';
@@ -738,6 +835,146 @@ function renderHistoryFilter(){
     wrap.appendChild(btn);
   });
 }
+function renderMetricFilter(){
+  const wrap = document.getElementById('metricFilter');
+  wrap.innerHTML='';
+  const opts = [
+    {k:'weight', label:'📈 น้ำหนัก (Progressive Overload)'},
+    {k:'volume', label:'🏋️ ปริมาณ (Volume)'},
+    {k:'kcal', label:'🔥 แคลอรี่'},
+    {k:'bodyweight', label:'⚖️ น้ำหนักตัว'}
+  ];
+  opts.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='filterchip'+(analysisMetric===o.k?' active':'');
+    btn.textContent=o.label;
+    btn.onclick=()=>{ analysisMetric=o.k; render(); };
+    wrap.appendChild(btn);
+  });
+}
+function renderRangeFilter(){
+  const wrap = document.getElementById('rangeFilter');
+  wrap.innerHTML='';
+  RANGES.forEach(r=>{
+    const btn = document.createElement('button');
+    btn.className='filterchip'+(analysisRange===r.k?' active':'');
+    btn.textContent=r.label;
+    btn.onclick=()=>{ analysisRange=r.k; render(); };
+    wrap.appendChild(btn);
+  });
+}
+function sessionValue(session, metric){
+  if(metric==='weight') return session.weight;
+  if(metric==='kcal') return (typeof session.kcal==='number') ? session.kcal : 0;
+  if(metric==='volume'){
+    const scheme = LADDER[session.schemeIndex];
+    const reps = (session.setLogs && session.setLogs.length)
+      ? session.setLogs.reduce((a,s)=>a+s.reps, 0)
+      : (scheme ? scheme.sets*scheme.reps : 0);
+    return session.weight * reps;
+  }
+  return 0;
+}
+function fmtNum(n){
+  if(Number.isInteger(n)) return String(n);
+  return (Math.round(n*10)/10).toString();
+}
+function fmtShortDate(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()}/${d.getMonth()+1}`;
+}
+function pickLabelIndices(n, maxLabels){
+  if(n<=maxLabels) return Array.from({length:n}, (_,i)=>i);
+  const idxs = new Set();
+  const step = (n-1)/(maxLabels-1);
+  for(let i=0;i<maxLabels;i++) idxs.add(Math.round(i*step));
+  idxs.add(0);
+  idxs.add(n-1);
+  return Array.from(idxs).sort((a,b)=>a-b);
+}
+// series: [{label, color, points:[{date:'YYYY-MM-DD', y:number}]}] — shared date-scaled axis, one line per series
+function svgMultiLineChart(series, opts){
+  opts = opts || {};
+  const w = opts.width || 300, h = opts.height || 190;
+  const padL=8, padR=8, padTop=22, padBottom=24;
+  const active = series.filter(s=>s.points && s.points.length);
+  if(!active.length) return { svg: `<div class="sub" style="margin:0;">ยังไม่มีข้อมูล</div>`, legend:'' };
+  const allPoints = active.flatMap(s=>s.points);
+  const dts = allPoints.map(p=>new Date(p.date+'T00:00:00').getTime());
+  const minDt = Math.min(...dts), maxDt = Math.max(...dts);
+  const dtRange = Math.max(1, maxDt-minDt);
+  const ys = allPoints.map(p=>p.y);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  if(minY===maxY){ minY -= 1; maxY += 1; }
+  const plotW = w-padL-padR, plotH = h-padTop-padBottom;
+  const xFor = dateStr => padL + ((new Date(dateStr+'T00:00:00').getTime()-minDt)/dtRange)*plotW;
+  const yFor = y => padTop + plotH - ((y-minY)/(maxY-minY))*plotH;
+  const unit = opts.unit || '';
+  const multi = active.length > 1;
+
+  let linesHtml = '', legendHtml = '';
+  active.forEach(s=>{
+    const sorted = s.points.slice().sort((a,b)=>a.date.localeCompare(b.date));
+    const labelIdx = new Set(multi ? [sorted.length-1] : pickLabelIndices(sorted.length, 8));
+    const linePts = sorted.map(p=>`${xFor(p.date).toFixed(1)},${yFor(p.y).toFixed(1)}`).join(' ');
+    const dots = sorted.map((p,i)=>{
+      const cx = xFor(p.date).toFixed(1), cy = yFor(p.y).toFixed(1);
+      let out = `<circle cx="${cx}" cy="${cy}" r="${multi?2.5:3}" fill="${s.color}"/>`;
+      if(labelIdx.has(i)){
+        const ly = Math.max(10, yFor(p.y)-7).toFixed(1);
+        out += `<text x="${cx}" y="${ly}" font-size="8.5" fill="${s.color}" text-anchor="middle" font-weight="700">${fmtNum(p.y)}${multi?'':unit}</text>`;
+      }
+      return out;
+    }).join('');
+    linesHtml += `<polyline points="${linePts}" fill="none" stroke="${s.color}" stroke-width="2"/>${dots}`;
+    legendHtml += `<span style="display:inline-flex;align-items:center;gap:4px;margin:0 10px 4px 0;"><span style="width:8px;height:8px;border-radius:50%;background:${s.color};display:inline-block;"></span>${multi?s.label+' ':''}<b style="color:var(--text);">${fmtNum(sorted[sorted.length-1].y)}${unit}</b></span>`;
+  });
+  let minDateStr = allPoints[0].date, maxDateStr = allPoints[0].date;
+  allPoints.forEach(p=>{ if(p.date<minDateStr) minDateStr=p.date; if(p.date>maxDateStr) maxDateStr=p.date; });
+  legendHtml = `<div class="sub" style="margin-top:6px;margin-bottom:0;">ล่าสุด: </div><div style="margin-top:2px;">${legendHtml}</div>`;
+  const svg = `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+      <line x1="${padL}" y1="${h-padBottom}" x2="${w-padR}" y2="${h-padBottom}" stroke="rgba(255,255,255,.12)"/>
+      ${linesHtml}
+      <text x="${padL}" y="${h-padBottom+14}" font-size="9" fill="#94a3b8">${fmtShortDate(minDateStr)}</text>
+      <text x="${w-padR}" y="${h-padBottom+14}" font-size="9" fill="#94a3b8" text-anchor="end">${fmtShortDate(maxDateStr)}</text>
+    </svg>
+  `;
+  return { svg, legend: legendHtml ? `<div style="margin-top:4px;">${legendHtml}</div>` : '' };
+}
+function renderChart(){
+  const el = document.getElementById('chartCard');
+  if(!el) return;
+  const liftFilterRow = document.getElementById('historyFilter');
+  if(liftFilterRow) liftFilterRow.style.display = (analysisMetric==='bodyweight') ? 'none' : 'flex';
+
+  if(analysisMetric === 'bodyweight'){
+    const cutoff = rangeCutoffDate();
+    let entries = (state.bodyweightLog||[]).slice();
+    if(cutoff) entries = entries.filter(e=>e.date>=cutoff);
+    const series = [{ label:'น้ำหนักตัว', color:'#22c55e', points: entries.map(e=>({date:e.date, y:e.weight})) }];
+    const { svg, legend } = svgMultiLineChart(series, {unit:'kg'});
+    el.innerHTML = `<div class="sub" style="margin-bottom:4px;font-weight:700;color:var(--text);">น้ำหนักตัว</div>${svg}${legend}
+      ${!entries.length?`<div class="sub" style="margin-top:8px;">ยังไม่มีบันทึกน้ำหนักตัว ไปบันทึกได้ที่หน้า "ตั้งค่า"</div>`:''}`;
+    return;
+  }
+
+  const liftsToShow = historyFilterLift==='all' ? LIFTS : [historyFilterLift];
+  const metric = analysisMetric;
+  const unit = metric==='weight' ? 'kg' : (metric==='kcal' ? ' kcal' : ' kg');
+  const series = liftsToShow.map(l=>{
+    const sessions = filterSessionsByRange(state.hero[l].sessions);
+    return {
+      label: LIFT_TH[l],
+      color: LIFT_COLORS[l],
+      points: sessions.slice().sort((a,b)=>a.date.localeCompare(b.date))
+        .map(s=>({date:s.date, y: metric==='weight' ? s.weight : Math.round(sessionValue(s, metric))}))
+    };
+  });
+  const label = metric==='weight' ? 'น้ำหนัก (Progressive Overload)' : (metric==='kcal' ? 'แคลอรี่ต่อเซสชัน' : 'ปริมาณการยก (น้ำหนัก×ครั้ง) ต่อเซสชัน');
+  const { svg, legend } = svgMultiLineChart(series, {unit});
+  el.innerHTML = `<div class="sub" style="margin-bottom:4px;font-weight:700;color:var(--text);">${label}</div>${svg}${legend}`;
+}
 function repsSummary(session){
   if(!session.setLogs || !session.setLogs.length) return '';
   const scheme = LADDER[session.schemeIndex];
@@ -749,6 +986,7 @@ function repsSummary(session){
   if(shortSets.length) out += ` · ทำไม่ครบ: ${shortSets.join(', ')}`;
   return out;
 }
+let lastHistoryEntries = [];
 function renderHistoryList(){
   const wrap = document.getElementById('historyList');
   let entries = [];
@@ -757,15 +995,19 @@ function renderHistoryList(){
     state.hero[l].sessions.forEach((s,idx)=> entries.push({l, s, idx}));
   });
   entries.sort((a,b)=> (b.s.date.localeCompare(a.s.date)) || 0);
+  lastHistoryEntries = entries;
   if(!entries.length){
     wrap.innerHTML = '<div class="sub" style="margin:0;">ยังไม่มีประวัติการฝึก</div>';
     return;
   }
-  wrap.innerHTML = entries.map(e=>`
-    <div class="logrow">
+  wrap.innerHTML = entries.map((e,i)=>`
+    <div class="logrow" data-idx="${i}">
       <div class="lh">
         <span>${LIFT_TH[e.l]} · ${e.s.label} (${e.s.phase})</span>
-        <span class="${e.s.result==='pass'?'tag-pass':'tag-fail'}">${e.s.result==='pass'?'✅ ผ่าน':'❌ ไม่ผ่าน'}</span>
+        <span>
+          <span class="${e.s.result==='pass'?'tag-pass':'tag-fail'}">${e.s.result==='pass'?'✅ ผ่าน':'❌ ไม่ผ่าน'}</span>
+          <span class="arrow">›</span>
+        </span>
       </div>
       <div class="lsub">${e.s.date} · ${e.s.weight}kg${typeof e.s.kcal==='number'?(' · ≈'+e.s.kcal+' kcal'):''}${e.s.mood?(' · '+e.s.mood):''}</div>
       ${repsSummary(e.s)?`<div class="lsub">${repsSummary(e.s)}</div>`:''}
@@ -775,6 +1017,48 @@ function renderHistoryList(){
 }
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
+/* ============ SESSION DETAIL MODAL ============ */
+function openSessionDetail(entry){
+  const { l, s } = entry;
+  const scheme = LADDER[s.schemeIndex];
+  let rowsHtml = '';
+  if(s.setLogs && s.setLogs.length){
+    rowsHtml = `<table class="detailtable"><thead><tr><th>เซ็ต</th><th>ครั้ง</th><th>เวลายก</th><th>พักหลังเซ็ต</th></tr></thead><tbody>`;
+    s.setLogs.forEach((set,i)=>{
+      const short = scheme && set.reps < scheme.reps;
+      const restAfter = (s.restLogs && s.restLogs[i]!=null) ? fmtMMSS(s.restLogs[i]) : '—';
+      rowsHtml += `<tr><td>#${i+1}</td><td class="${short?'short':''}">${set.reps}${scheme?('/'+scheme.reps):''}</td><td>${fmtMMSS(set.activeSec)}</td><td>${restAfter}</td></tr>`;
+    });
+    rowsHtml += `</tbody></table>`;
+  } else {
+    rowsHtml = `<div class="sub" style="margin-top:10px;">ไม่มีข้อมูลจับเวลารายเซ็ต (บันทึกแบบกรอกเวลารวมหรือประมาณอัตโนมัติ)</div>`;
+  }
+  const energyLine = (typeof s.activeMin==='number')
+    ? `<div class="sub" style="margin-top:6px;">ยกจริงรวม ${fmtMMSS(s.activeMin*60)} · พักรวม ${fmtMMSS(s.restMin*60)} · รวมเซสชัน ~${Math.round(s.durationMin)} นาที (${s.durationSource==='timer'?'จับเวลาจริง':s.durationSource==='manual'?'กรอกเวลาเอง':'ประมาณอัตโนมัติ'})</div>`
+    : '';
+  const box = document.getElementById('detailBox');
+  box.innerHTML = `
+    <div class="row-between">
+      <h2>${LIFT_TH[l]} · ${s.label}</h2>
+      <button class="smallbtn ghost" id="detailCloseBtn">✕ ปิด</button>
+    </div>
+    <div class="sub" style="margin:6px 0 0;">${s.date} · ${s.phase} Phase · น้ำหนัก ${s.weight}kg</div>
+    <div class="sub" style="margin:2px 0 0;">ผล: ${s.result==='pass'?'✅ ผ่าน':'❌ ไม่ผ่าน'}${typeof s.kcal==='number'?(' · ≈'+s.kcal+' kcal'):''}</div>
+    ${energyLine}
+    ${s.mood?`<div class="sub" style="margin-top:4px;">ความรู้สึก: ${s.mood}</div>`:''}
+    ${s.notes?`<div class="lnote" style="margin-top:8px;">${escapeHtml(s.notes)}</div>`:''}
+    ${rowsHtml}
+  `;
+  document.getElementById('detailLay').style.display = 'flex';
+  setTimeout(()=>{
+    const closeBtn = document.getElementById('detailCloseBtn');
+    if(closeBtn) closeBtn.addEventListener('click', closeSessionDetail);
+  },0);
+}
+function closeSessionDetail(){
+  document.getElementById('detailLay').style.display = 'none';
+}
+
 /* ============ SETUP PAGE ============ */
 function renderSetup(){
   const wrap = document.getElementById('setupCards');
@@ -782,10 +1066,19 @@ function renderSetup(){
 
   const bwCard = document.createElement('div');
   bwCard.className = 'card';
+  const todayStr = new Date().toISOString().slice(0,10);
+  const lastBw = state.bodyweightLog.length ? state.bodyweightLog[state.bodyweightLog.length-1] : null;
   bwCard.innerHTML = `
     <h3>น้ำหนักตัว (สำหรับคำนวณแคลอรี่)</h3>
-    <div class="sub" style="margin-bottom:8px;">ใช้คำนวณแคลอรี่โดยประมาณของแต่ละเซสชัน (ดูได้ในหน้า "ประวัติ" และ "สถานะ")</div>
-    <div class="field"><label>น้ำหนักตัว (kg)</label><input type="number" step="0.5" value="${state.bodyweight}" id="bodyweightInput"></div>
+    <div class="sub" style="margin-bottom:8px;">ค่านี้ใช้คำนวณแคลอรี่โดยประมาณของแต่ละเซสชัน (ดูได้ในหน้า "สถานะ" และ "วิเคราะห์")</div>
+    <div class="field"><label>น้ำหนักตัวปัจจุบัน (kg)</label><input type="number" step="0.5" value="${state.bodyweight}" id="bodyweightInput"></div>
+    <div class="sectiontitle" style="margin:14px 0 6px;">บันทึกน้ำหนักตัว (ดูเทรนด์ได้ในหน้า "วิเคราะห์")</div>
+    <div class="grid4">
+      <div class="field"><label>วันที่</label><input type="date" id="bwLogDate" value="${todayStr}"></div>
+      <div class="field"><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="bwLogWeight" placeholder="${state.bodyweight}"></div>
+    </div>
+    <button class="smallbtn primary" id="btnLogBW" style="width:100%;margin-top:8px;">⚖️ บันทึกน้ำหนักวันนี้</button>
+    ${lastBw ? `<div class="sub" style="margin-top:8px;">บันทึกล่าสุด: ${lastBw.date} · ${lastBw.weight}kg (ทั้งหมด ${state.bodyweightLog.length} ครั้ง)</div>` : ''}
   `;
   wrap.appendChild(bwCard);
 
@@ -810,6 +1103,15 @@ function renderSetup(){
     document.getElementById('bodyweightInput').addEventListener('change', e=>{
       state.bodyweight = Number(e.target.value) || 75;
       saveState();
+    });
+    document.getElementById('btnLogBW').addEventListener('click', ()=>{
+      const date = document.getElementById('bwLogDate').value;
+      const wVal = document.getElementById('bwLogWeight').value || document.getElementById('bodyweightInput').value;
+      if(logBodyweight(date, wVal)){
+        render(); showToast('บันทึกน้ำหนักตัวแล้ว ⚖️');
+      } else {
+        showToast('กรุณากรอกวันที่และน้ำหนักให้ถูกต้อง');
+      }
     });
     wrap.querySelectorAll('[data-oneRM]').forEach(inp=>{
       inp.addEventListener('change', e=>{
@@ -853,11 +1155,25 @@ function goPage(p){
 function render(){
   if(curPage==='today'){ renderLiftPicker(); renderToday(); }
   else if(curPage==='status'){ renderStatus(); }
-  else if(curPage==='history'){ renderHistoryFilter(); renderHistoryList(); }
+  else if(curPage==='history'){ renderHistoryFilter(); renderMetricFilter(); renderRangeFilter(); renderChart(); renderHistoryList(); }
   else if(curPage==='setup'){ renderSetup(); }
 }
 
 document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click', ()=>goPage(b.getAttribute('data-page'))));
+
+document.getElementById('historyList').addEventListener('click', e=>{
+  const row = e.target.closest('.logrow');
+  if(!row) return;
+  const idx = Number(row.getAttribute('data-idx'));
+  const entry = lastHistoryEntries[idx];
+  if(entry) openSessionDetail(entry);
+});
+document.getElementById('detailLay').addEventListener('click', e=>{
+  if(e.target.id === 'detailLay') closeSessionDetail();
+});
+document.getElementById('weeklyLay').addEventListener('click', e=>{
+  if(e.target.id === 'weeklyLay') document.getElementById('weeklyLay').style.display='none';
+});
 
 document.getElementById('btnExport').onclick = ()=>{
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
@@ -880,6 +1196,7 @@ document.getElementById('fileImport').addEventListener('change', e=>{
       LIFTS.forEach(l=>{ if(!state.hero[l]) state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
       if(!state.ui) state.ui = { curLift:'Squat' };
       if(state.bodyweight==null) state.bodyweight = 75;
+      if(!Array.isArray(state.bodyweightLog)) state.bodyweightLog = [];
       saveState(); render(); showToast('นำเข้าข้อมูลสำเร็จ');
     }catch(err){ showToast('ไฟล์ไม่ถูกต้อง'); }
   };
@@ -887,7 +1204,7 @@ document.getElementById('fileImport').addEventListener('change', e=>{
 });
 document.getElementById('btnResetAll').onclick = ()=>{
   if(confirm('ล้างข้อมูลทั้งหมด (ทุกท่า ทุกรอบ ทุกประวัติ) ใช่หรือไม่?')){
-    state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75 };
+    state = { hero:{}, ui:{ curLift:'Squat' }, bodyweight: 75, bodyweightLog: [] };
     LIFTS.forEach(l=>{ state.hero[l] = freshLiftState(DEFAULT_1RM[l]); });
     saveState(); render(); showToast('ล้างข้อมูลแล้ว');
   }
@@ -901,6 +1218,18 @@ try{ if(localStorage.getItem('hero_seen_intro')) document.getElementById('introl
 
 state.ui.curLift = recommendedLift();
 render();
+
+try{
+  const todayStr2 = new Date().toISOString().slice(0,10);
+  const lastShown = localStorage.getItem('hero_summary_shown_date');
+  if(lastShown !== todayStr2){
+    const sum = getWeeklySummary();
+    if(sum.sessionCount > 0){
+      showWeeklySummary(sum);
+      localStorage.setItem('hero_summary_shown_date', todayStr2);
+    }
+  }
+}catch(e){}
 </script>
 </body>
 </html>
